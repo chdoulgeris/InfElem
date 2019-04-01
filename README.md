@@ -5,7 +5,7 @@ The 1st code approximate the problem as one-dimensional saturated groundwater fl
 
 Both numerical codes were developed by Ch. Doulgeris in FORTRAN 95. 
 
-Further information
+Further information:
 Dr Charalampos Doulgeris,
 Researcher in hydrology
 
