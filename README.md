@@ -6,13 +6,13 @@ The 1st code approximate the problem as one-dimensional saturated groundwater fl
 Both numerical codes were developed by Ch. Doulgeris in FORTRAN 95. 
 
 Further information
-Dr Charalampos Doulgeris
+Dr Charalampos Doulgeris,
 Researcher in hydrology
 
-Hellenic Agricultural Organisation
-Soil & Water Resources Institute
-Industrial Area of Thessaloniki
-574 00, Sindos
+Hellenic Agricultural Organisation,
+Soil & Water Resources Institute,
+Industrial Area of Thessaloniki,
+574 00, Sindos,
 GREECE
 
 tel: +30 2310 798790
