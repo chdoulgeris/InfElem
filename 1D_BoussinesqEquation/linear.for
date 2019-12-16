@@ -90,69 +90,69 @@ C
 	WRITE(30,204)DX*ABS(HO-HA),DT*(HO-HA)**2/RA,N,NB,NT,KMAX,
      $a4,RK,RS,HO,HA,RD
 	WRITE(12,203)IX,DX*IX
- 300	FORMAT('Numerical experiments in linear Boussinesqs eguation'/
+ 300	FORMAT('Numerical experiments in linear Boussinesq eguation'/
      $'with three differnte methods'/'1. FINITE ELEMENTS'/
      $'2. USING INFINITE ELEMENT FOR f(ri/r)=(ri/r)**a'/
      $'3. USING INFINITE ELEMENT FOR f(ri/r)=exp{a*(ri-r)}'//
      $'Input data in file linear.in'/
      $'WAIT...'/)
  100	FORMAT(/////////////F10.5///F10.5,7(///I10),13(///F10.5))
- 200	FORMAT('аявеио енодоу апотекеслатым - lineara.out'//
-     $'епикусг тгс цяаллийопоиглемгс(ыс пяос г**2)'/
-     $'йаи адиастатгс енисысгс тоу BOUSSINESQ'/
-     $'йахыс йаи тгс енисысгс тгс летажояас лафас'/
-     $'ле тг леходо тым пепеяаслемым стоивеиым'//
-     $'тяопои пяоссеццисгс сто текос тгс пеяиовгс лекетгс'/
-     $'1. пепеяаслемо стоивеио - Z1(J)'/
-     $'2. глиапеияо стоивеио опоу f(ri/r)=(ri/r)**a - Z2(J)'/
-     $'3. глиапеияо стоивеио опоу f(ri/r)=exp{a*(ri-r)} - Z3(J)'//
-     $'та апотекеслата еимаи се адиастатг лояжг'//
+ 200	FORMAT('OUTPUT FILE - RESULTS - lineara.out'//
+     $'SOLVING THE LINEARISED(AS г**2)'/
+     $'AND NON-DIMENSIONAL EQUATION OF BOUSSINESQ'/
+     $'AS WELL AS THE EQUATION OF CONTAMINANT TRANSPORT'/
+     $'USING THE FINITE ELEMENT METHOD'//
+     $'APPROACHES AT THE EDGE OF THE SIMULATION AREA'/
+     $'1. FINITE ELEMENT - Z1(J)'/
+     $'2. INFINITE ELEMENT, f(ri/r)=(ri/r)**a - Z2(J)'/
+     $'3. INFINITE ELEMENT, f(ri/r)=exp{a*(ri-r)} - Z3(J)'//
+     $'RESULTS ARE IN NON-DIMENSIONAL FORM'//
      $'DX=',F10.5/'DT=',F10.5/'N=',I10/'NB=',I10/
      $'NT=',I10/'KMAX=',I10/'a=',F10.5/
-     $'I=вяомийос деийтгс летабокгс'/'J=выяийос деийтгс летабокгс'/
-     $'TIME=адиастатос вяомос'/////'апотекеслата')
- 201	FORMAT('аявеио енодоу апотекеслатым - linearb.out'//
-     $'епикусг тгс цяаллийопоиглемгс(ыс пяос г**2)'/
-     $'йаи адиастатгс енисысгс тоу BOUSSINESQ'//
-     $'тилес тгс паяовгс се адиастатг лояжг'//
+     $'I=TIME INDEX'/'J=SPATIAL INDEX'/
+     $'TIME=NON-DIMENSIONAL TIME'/////'RESULTS')
+ 201	FORMAT('OUTPUT FILE - RESULTS - linearb.out'//
+     $'SOLVING THE LINEARISED(AS г**2)'/
+     $'AND NON-DIMENSIONAL EQUATION OF BOUSSINESQ'//
+     $'DISCHARGE VALUES IN NON-DIMENSIONAL FORM'//
      $4X,'I',5X,'Q1(I)',5X,'Q2(I)',5X,'Q3(I)')
- 202	FORMAT('аявеио енодоу апотекеслатым - linf1rc.out'//
-     $'епикусг тгс цяаллийопоиглемгс(ыс пяос г**2)'/
-     $'йаи адиастатгс енисысгс тоу BOUSSINESQ'/
-     $'йахыс йаи тгс енисысгс тгс летажояас лафас'/
-     $'ле тг леходо тым пепеяаслемым стоивеиым'//
-     $'тяопои пяоссеццисгс сто текос тгс пеяиовгс лекетгс'/
-     $'1. пепеяаслемо стоивеио - Z1(J)'/
-     $'2. глиапеияо стоивеио опоу f(ri/r)=(ri/r)**a - Z2(J)'/
-     $'3. глиапеияо стоивеио опоу f(ri/r)=exp{a*(ri-r)} - Z3(J)'//
-     $'та апотекеслата еимаи се ломадес тоу летяийоу сустглатос'//
+ 202	FORMAT('OUTPUT FILE - RESULTS - linf1rc.out'//
+     $'SOLVING THE LINEARISED(ыс пяос г**2)'/
+     $'AND NON-DIMENSIONAL EQUATION OF BOUSSINESQ'/
+     $'AS WELL AS THE EQUATION OF CONTAMINANT TRANSPORT'/
+     $'USING THE FINITE ELEMENT METHOD'//
+     $'APPROACHES AT THE EDGE OF THE SIMULATION AREA'/
+     $'1. FINITE ELEMENT - Z1(J)'/
+     $'2. INFINITE ELEMENT, f(ri/r)=(ri/r)**a - Z2(J)'/
+     $'3. INFINITE ELEMENT, f(ri/r)=exp{a*(ri-r)} - Z3(J)'//
+     $'RESULTS ARE IN S.I. UNITS'//
      $'DX(m)=',F10.5/'DT(day)=',F10.5/'N=',I10/'NB=',I10/'NT=',I10/
      $'KMAX=',I10/'a=',F10.5/'RK(m/day)=',F10.5/'RS=',F10.5/
      $'HO(m)=',F10.5/'HA(m)=',F10.5/'RD(m)=',F10.5/
-     $'I=вяомийос деийтгс летабокгс'/'J=выяийос деийтгс летабокгс'/
-     $'TIME=адиастатос вяомос'/////'апотекеслата')
- 203	FORMAT('аявеио енодоу апотекеслатым - lineard.out'//
-     $'епикусг тгс цяаллийопоиглемгс(ыс пяос г**2)'/
-     $'йаи адиастатгс енисысгс тоу BOUSSINESQ'//
-     $'тилес тгс упоцеиас стахлгс стом йолбо ив'//
-     $'йолбос ив=',I5,2X,'хесг тоу йолбоу =',E8.2//
+     $'I=TIME INDEX'/'J=SPATIAL INDEX'/
+     $'TIME=NON-DIMENSIONAL TIME'/////'RESULTS')
+ 203	FORMAT('OUTPUT FILE - RESULTS - lineard.out'//
+     $'SOLVING THE LINEARISED(AS г**2)'/
+     $'AND NON-DIMENSIONAL EQUATION OF BOUSSINESQ'//
+     $'WATER TABLE VALUES AT NODE IX'//
+     $'NODE IX=',I5,2X,'POSITION OF NODE =',E8.2//
      $4X,'I',4X,'ф1(Iв)',4X,'ф2(Iв)',4X,'ф3(Iв)',5X,'a4-Z2',6X,'a4-Z3')	
- 204	FORMAT('аявеио енодоу апотекеслатым - Polution.out'//
-     $'епикусг тгс цяаллийопоиглемгс(ыс пяос г**2)'/
-     $'йаи адиастатгс енисысгс тоу BOUSSINESQ'/
-     $'йахыс йаи тгс енисысгс тгс летажояас лафас'/
-     $'ле тг леходо тым пепеяаслемым стоивеиым'//
-     $'та апотекеслата еимаи се ломадес тоу летяийоу сустглатос'/
-     $'циа тис тилес тоу жоятиоу се йкеисто удяожояеа-PZ1(m)'/
-     $'йаи циа тис тилес тгс суцйемтяысгсг-PC1(mg/l)'//
+ 204	FORMAT('OUTPUT FILE - RESULTS - Polution.out'//
+     $'SOLVING THE LINEARISED(AS г**2)'/
+     $'AND NON-DIMENSIONAL EQUATION OF  BOUSSINESQ'/
+     $'AS WELL AS THE EQUATION OF CONTAMINANT TRANSPORT'/
+     $'USING THE FINITE ELEMENT METHOD'//
+     $'RESULTS ARE IN S.I. UNITS'/
+     $'FOR THE PIEZOMETRIC HEAD IN CONFINED AQUIFER-PZ1(m)'/
+     $'AND FOR THE CONCENTRATION-PC1(mg/l)'//
      $'DX(m)=',F10.5/'DT(day)=',F10.5/'N=',I10/
      $'NB=',I10/'NT=',I10/'KMAX=',I10/'a=',F10.5/'RK(m/day)=',F10.5/
      $'RS=',F10.5/'HO(m)=',F10.5/'HA(m)=',F10.5/'RD(m)=',F10.5/
-     $'I=вяомийос деийтгс летабокгс'/'J=выяийос деийтгс летабокгс'/
-     $'TIME=адиастатос вяомос'/////'апотекеслата')
+     $'I=TIME INDEX'/'J=SPATIAL INDEX'/
+     $'TIME=NON-DIMENSIONAL TIME'/////'RESULTS')
 
 
-C	еИСАЦЫЦч ОЯИАЙчР СУМХчЙГР СТГМ ТэЖЯО & АЯВИЙчР СУМХчЙГР
+C	Boundary condition in river/stream - initial condition
 C	*******************************************************
 	IF(HO>HA)THEN
 	HOD=1
@@ -214,13 +214,13 @@ C	*******************************************************
 
 
 
-C	сУМТЕКЕСТщР ПЯЧТГР ЕНъСЫСГР
+C	Coefficient of 1st equation
 C	***************************
 	B(1)=2/DX+2*DX/3/DT
 	C(1)=1/DX-DX/6/DT
 	D(1)=(1/DX)*HOD+(2*DX/3/DT)*H(1)+(DX/6/DT)*H(2)
 
-C	сУМТЕКЕСТщР ТЫМ УПЭКОИПЫМ ЕНИСЧСЕЫМ
+C	Coefficients of the rest of the equations
 C	***********************************
 	DO 20 J=2,NBK-1
 	A(J)=1/DX-DX/6/DT
@@ -229,7 +229,7 @@ C	***********************************
 	D(J)=(DX/6/DT)*H(J-1)+(2*DX/3/DT)*H(J)+(DX/6/DT)*H(J+1)
  20   CONTINUE
 	
-C	сУМТЕКЕСТщР ТЕКЕУТАъАР ЕНъСЫСГР
+C	Coefficient of last equation
 C	*******************************
 	IF(METHOD==1) THEN
 	A(NBK)=1/DX-DX/6/DT
@@ -248,7 +248,7 @@ C	*******************************
 	ENDIF
 	
 
-C	аКЦЭЯИХЛОР ТОУ THOMAS
+C	THOMAS algorithm
 C	*********************
 	U(1)=C(1)/B(1)
 	V(1)=D(1)/B(1)
@@ -270,7 +270,7 @@ C	*********************
  41   CONTINUE
 	ENDIF
 
-C	пЯОЕТОИЛАСъА ЦИА ТГМ ЕПЭЛЕМГ ВЯОМИЙч СТИЦЛч
+C	Preperation for the next time step
 C	*******************************************
 	IF(METHOD==1) Z1=V
 	IF(METHOD==2) Z2=V
@@ -279,7 +279,7 @@ C	*******************************************
 
 
 
-C	лЕТАЖОЯэ ЛэФАР
+C	Contaminant transport
 C	**************
 	DO METHODC=1,3
 	IF(METHODC==1) THEN
@@ -338,14 +338,14 @@ C	**************
 
 
 
-C	сУМТЕКЕСТщР ПЯЧТГР ЕНъСЫСГР
+C	Coefficients of 1st equation
 C	************************
 	B(1)=(PD(0)+2*PD(1)+PD(2))/2/PDX-(PV(0)-PV(2))/6+2/PDX+2*PDX/3/PDT
 	C(1)=(PD(1)+PD(2))/2/PDX-(PV(1)+2*PV(2))/6+1/PDX-PDX/6/PDT
 	D(1)=((PD(0)+PD(1))/2/PDX+(2*PV(0)+PV(1))/6+1/PDX)*PCO
      $+(2*PDX/3/PDT)*PC(1)+(PDX/6/PDT)*PC(2)
 
-C	сУМТЕКЕСТщР ТЫМ УПЭКОИПЫМ ЕНИСЧСЕЫМ
+C	Coefficients of the rest of the equations
 C	***********************************
 	DO  J=2,NBK-1
 	A(J)=(PD(J-1)+PD(J))/2/PDX+(2*PV(J-1)+PV(J))/6+1/PDX-PDX/6/PDT
@@ -355,7 +355,7 @@ C	***********************************
 	D(J)=(PDX/6/PDT)*PC(J-1)+(2*PDX/3/PDT)*PC(J)+(PDX/6/PDT)*PC(J+1)
 	ENDDO
 	
-C	сУМТЕКЕСТщР ТЕКЕУТАъАР ЕНъСЫСГР
+C	Coefficients of the last equation
 C	*******************************
 	IF (METHODC==1) THEN
 	A(NBK)=(PD(NBK-1)+PD(NBK))/2/PDX+(2*PV(NBK-1)+PV(NBK))/6
@@ -380,7 +380,7 @@ C	*******************************
 	D(NK)=(PDX/6/PDT)*PC(NK-1)+(PDX/3/PDT+PDX*OLC2/PDT)*PC(NK)
 	ENDIF
 
-C	аКЦЭЯИХЛОР ТОУ THOMAS
+C	THOMAS algorithm
 C	*********************
 	U(1)=C(1)/B(1)
 	V(1)=D(1)/B(1)
@@ -402,7 +402,7 @@ C	*********************
 	ENDDO
 	ENDIF
 
-C	пЯОЕТОИЛАСъА ЦИА ТГМ ЕПЭЛЕМГ ВЯОМИЙч СТИЦЛч
+C	Preperation for the next time step
 C	*******************************************
 	IF(METHODC==1) PC1=V
 	IF(METHODC==2) PC2=V
@@ -410,7 +410,7 @@ C	*******************************************
 	ENDDO
 
 
-C	еЙТЩПЫСГ ТЫМ АПОТЕКЕСЛэТЫМ
+C	Results writing
 C	*************************
 	IF(MOD(I,NN)==0)THEN
 c	IF(time==1. .or. time==1.5 .or. time==2. .or. time==3.
@@ -418,7 +418,7 @@ c     $ .or. time==5. .or. time==8.
 c     $ .or. time==12. .or. time==20. .or. time==30.
 c     $ .or. time==50. .or. time==100. .or. time==200.
 c     $ .or. time==400. .or. time==1000.)THEN
-C	еЙТЩПЫСГ ТЫМ ЖОЯТъЫМ СЕ АДИэСТАТЕР ЙАИ ПЯАЦЛАТИЙщР ТИЛщР
+C	Piezometric head in non-dimensional and S.I. untis
 	WRITE(9,210)I,TIME,DX
 	WRITE(23,*)I,TIME
 	WRITE(24,*)I,TIME
@@ -444,7 +444,7 @@ C	еЙТЩПЫСГ ТЫМ ЖОЯТъЫМ СЕ АДИэСТАТЕР ЙАИ ПЯАЦЛАТИЙщР ТИЛщР
 	WRITE(11,230)NBK,HA**2*HOD+HO**2*(1-HOD)+ABS(HO**2-HA**2)*Z1(NBK),
      $NBK*DX*ABS(HO-HA)
 
-C	уПОКОЦИСЛЭР ЙАИ ЕЙТЩПЫСГ ТГР ПАЯОВчР СЕ АДИэСТАТЕР ТИЛщР
+C	Discharge in non-dimensional units
 	Q1=ABS(HOD-Z1(1))/DX
 	Q2=ABS(HOD-Z2(1))/DX
 	Q3=ABS(HOD-Z3(1))/DX
@@ -454,13 +454,13 @@ C	уПОКОЦИСЛЭР ЙАИ ЕЙТЩПЫСГ ТГР ПАЯОВчР СЕ АДИэСТАТЕР ТИЛщР
 	WRITE(17,*)Q3
 
 
-C	еЙТЩПЫСГ ТГР УПЭЦЕИАР СТэХЛГР СТОМ ЙЭЛБО IX
+C	Water table in node IX
 	WRITE(12,222)I,Z1(IX),Z2(IX),Z3(IX),XI2,XI3
 	WRITE(19,*)Z1(IX)
 	WRITE(20,*)Z2(IX)
 	WRITE(21,*)Z3(IX)
 
-C	еЙТЩПЫСГ ТЫМ АПОТЕКЕСЛэТЫМ ЛЕТАЖОЯэР ЛэФАР
+C	Contaminant transport
 	WRITE(31,*)I,TIME*(HO-HA)**2/RA
 	DO J=NNJ,NBK,NNJ
 	WRITE(30,*)J,PZ1(J),PC1(J),PV1(J)

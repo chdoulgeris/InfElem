@@ -19,25 +19,25 @@
 
 	CALL CPU_TIME(TIMEBEGIN)
 
-C	ΑΡΧΕΙΑ ΠΟΥ ΧΡΗΣΙΜΟΠΟΙΟΥΝΤΑΙ
-	OPEN(7,FILE='input.grd')		!Δεδομένα δικτύου και οριακών συνθηκών
-	OPEN(8,FILE='UnRiv1.dat')		!Υδραυλικά και Λοιπά δεδομένα
-	OPEN(9,FILE='UnRiv.res')		!Εκτύπωση των δεδομένων του προβλήματος
+C	FILES
+	OPEN(7,FILE='input.grd')		!Mesh data and boundary condition
+	OPEN(8,FILE='UnRiv1.dat')		!Hydraulic and other data
+	OPEN(9,FILE='UnRiv.res')		!Writing the data
 
-	OPEN(14,FILE='PHI1_UnRiv.res')	!Τιμές του φορτίου σε κάθε κόμβο
-	OPEN(10,FILE='PHI2_UnRiv.res')	!Φορτίο και ύψος πίεσης στις συντεταγμένες
-	OPEN(11,FILE='VOL_UnRiv.res')	!Όγκος νερού με το χρόνο
-	OPEN(13,FILE='Q1_UnRiv.res')	!Παροχή στους κόμβους προκαθ. φορτίου
-	OPEN(20,FILE='Q2_UnRiv.res')	!Συνολική παροχή στο ρέμα με το χρόνο
-
-
-	OPEN(12,FILE='INF_UnRiv.res')	!Τιμές φορτίου στο τέλος της περιοχής
-	OPEN(31,FILE='TEST1_UnRiv.res')	!Αρχείο για δοκιμές
-	OPEN(32,FILE='TEST2_UnRiv.res')	!Αρχείο για δοκιμές
+	OPEN(14,FILE='PHI1_UnRiv.res')	!Piezometric head in nodes
+	OPEN(10,FILE='PHI2_UnRiv.res')	!Head and pressure in coordinates
+	OPEN(11,FILE='VOL_UnRiv.res')	!Water volume in time
+	OPEN(13,FILE='Q1_UnRiv.res')	!Discharge in nodes of predefined (known) )head
+	OPEN(20,FILE='Q2_UnRiv.res')	!Total discharge at river
 
 
-C	ΕΙΣΑΓΩΓΗ ΚΑΙ ΕΓΓΡΑΦΗ ΤΩΝ ΔΕΔΟΜΕΝΩΝ
-C	Γεωμετρικά δεδομένα
+	OPEN(12,FILE='INF_UnRiv.res')	!Head at the edge of the area
+	OPEN(31,FILE='TEST1_UnRiv.res')	!Dummy file
+	OPEN(32,FILE='TEST2_UnRiv.res')	!Dummy file
+
+
+C	INPUT AND WRITING OF DATA
+C	Spatial data
 	READ(7,*)
 	READ(7,*)NELEM,NNP,NBAND,METHOD,TIMERENUM
 	ALLOCATE(PHI(NNP),PHINEW(NNP),PHIEST(NNP),PHALF(NNP),PHIOLD(NNP))
@@ -51,7 +51,7 @@ C	Γεωμετρικά δεδομένα
  11	READ(7,*)X(I),Y(I)
 	READ(7,*)
 
-C	Χαρακτηριστικοί κόμβοι του δικτύου
+C	Special nodes
 	READ(7,*)NFIX
 	ALLOCATE(NNX(NFIX),YY(NFIX))
 	ALLOCATE(AKQ(NNP,NNP),BKQ(NNP),BKQ1(NNP),QNFIX(NNP))
@@ -67,34 +67,34 @@ C	Χαρακτηριστικοί κόμβοι του δικτύου
 	READ(7,*)
 	READ(7,*)WOA
 
-C	Εισαγωγή αρχικής συνθήκης
+C	Initial condition
 	READ(8,1000)HSTART,ERROR1,PHIVAR
 	DO 14 I=1,NNP
  14	PHI(I)=HSTART
 
-C	Εισαγωγή οριακής συνθήκης στην περιοχή του ποταμού
+C	Initial condition in river
 	DO 15 I=1,NFIX
  15	PHI(NNX(I))=YY(I)
 
-C	Ειδική παροχή βροχόπτωσης-άρδευσης
+C	Rain-irrigation
 	READ(8,1010)RAIN
 	DO 16 I=1,NQ
  16	Q(I)=QL(I)*RAIN
 
-C	Τελική τιμή του χρόνου και χρονικό βήμα εκτέλεσης
+C	Simulation time and time step
 	READ(8,1010)TSTOP
 	READ(8,1010)DT
 
-C	Αριθμός επαναλήψεων σύγκλισης
+C	Number of iteration for convergence
 	READ(8,1030)ITERMAX
 
-C	Παράμετροι Brooks-Corey για κάθε εδαφική στρώση
+C	Brooks-Corey parameters for each soil layer
 	READ(8,1020)TSAT1,TRES1,CKSXX1,CKSYY1
 	READ(8,*)HB1,CLM1,CN1
 	READ(8,1020)TSAT2,TRES2,CKSXX2,CKSYY2
 	READ(8,*)HB2,CLM2,CN2
 
-C	Σημεία ολοκλήρωσης και σταθμιστικοί παράγοντες
+C	Integration points and weighting factors
 	READ(8,1040)NGP
 	READ(8,*)
 	READ(8,*)(RW(K),K=1,NGP)
@@ -107,7 +107,7 @@ C	Σημεία ολοκλήρωσης και σταθμιστικοί παράγοντες
 	READ(8,*)
 	READ(8,*)(RJINF(K),K=1,NGPINF)
 
-C	Μέθοδος προσέγγισης στο τέλος της περιοχής μελέτης
+C	Aproaches at the edge of the simulation area
 	READ(8,1050)INFMETHOD
 	READ(8,*)
 	READ(8,*)RA
@@ -123,7 +123,7 @@ C	Μέθοδος προσέγγισης στο τέλος της περιοχής μελέτης
  1040 FORMAT(///I5)
  1050 FORMAT(//////I5)
 
-C	Εγγραφή των δεδομένων του προβλήματος
+C	Data writing
 	WRITE(9,2000)NELEM,NNP,NBAND,METHOD
 	WRITE(9,2010)(I,(NOD(I,J),J=1,4),I=1,NELEM)
 	WRITE(9,2020)(I,(X(I),Y(I)),I=1,NNP)
@@ -138,113 +138,113 @@ C	Εγγραφή των δεδομένων του προβλήματος
 	 WRITE(9,2085)NGP
 	ELSE
 	 WRITE(9,2086)NGP,NGPINF
-	 IF (INFMETHOD==1) METHOD_INF='ΓΡΑΜΜΙΚΗ'
-	 IF (INFMETHOD==2) METHOD_INF='ΕΚΘΕΤΙΚΗ'
+	 IF (INFMETHOD==1) METHOD_INF='LINEAR'
+	 IF (INFMETHOD==2) METHOD_INF='EXPONENTIAL'
 	  WRITE(9,2090)METHOD_INF,RA,XSTART,YSTART,Xdirec,Ydirec
 	ENDIF
 
 	WRITE(10,2100)
- 2000 FORMAT('ΑΡΧΕΙΟ ΑΠΟΤΕΛΕΣΜΑΤΩΝ - UnRiv.res'/33('*')/
-     $'ΑΡΙΘΜΟΣ ΤΩΝ ΣΤΟΙΧΕΙΩΝ ΤΟΥ ΔΙΚΤΥΟΥ ='I5/
-     $'ΑΡΙΘΜΟΣ ΤΩΝ ΚΟΜΒΩΝ ΤΟΥ ΔΙΚΤΥΟΥ    ='I5/
-     $'ΕΥΡΟΣ ΤΟΥ ΔΙΚΤΥΟΥ                 ='I5/
-     $'ΜΕΘΟΔΟΣ ΑΝΑΡΙΘΜΗΣΗΣ ΤΟΥ ΔΙΚΤΥΟΥ   = ΑΛΓΟΡΙΘΜΟΣ ΤΟΥ 'A8)
- 2010 FORMAT(/'α/α ΣΤΟΙΧΕΙΩΝ',5X,'ΚΟΜΒΟΙ ΤΟΥ ΣΤΟΙΧΕΙΟΥ'/
+ 2000 FORMAT('OUTPUT FILE - RESULTS - UnRiv.res'/33('*')/
+     $'ELEMENT NUMBER='I5/
+     $'NODE NUMBER='I5/
+     $'BANDWIDTH OF MESH='I5/
+     $'RENUMBERING METHOD OF MESH = ALGORITHM OF 'A8)
+ 2010 FORMAT(/'ELEMENT',5X,'NODES OF ELEMENT'/
      $(2X,I5,5X,4(2X,I5)))
- 2020 FORMAT(/'ΣΥΝΤΕΤΑΓΜΕΝΕΣ ΤΩΝ ΚΟΜΒΩΝ'/3(4X'I',8X'X',8X,'Y',5X)/
+ 2020 FORMAT(/'COORDINATES OF NODES'/3(4X'I',8X'X',8X,'Y',5X)/
      $3(I5,2(1X,F8.2),5X))
- 2030 FORMAT(/'ΚΟΜΒΟΙ ΓΝΩΣΤΟΥ ΦΟΡΤΙΟΥ ='1X,I3/
-     $2X'ΚΟΜΒΟΣ',5X,'ΦΟΡΤΙΟ'/(3X,I5,3X,F8.3))
- 2040 FORMAT(/'ΚΟΜΒΟΙ ΓΝΩΣΤΗΣ ΠΑΡΟΧΗΣ ='1X,I3/
-     $2X'ΚΟΜΒΟΣ',3X,'ΜΗΚΟΣ ΡΟΗΣ'/(3X,I5,5X,F8.3))
+ 2030 FORMAT(/'NODES OF KNOWN HEAD='1X,I3/
+     $2X'NODE',5X,'HEAD'/(3X,I5,3X,F8.3))
+ 2040 FORMAT(/'NODES OF KNOWN DISCHARGE='1X,I3/
+     $2X'NODE',3X,'FLOW LENGHT'/(3X,I5,5X,F8.3))
  2050 FORMAT(
-     $/'Αρχική τιμή υδραυλικού φορτίου(m)                  = ',F10.2
-     $/'Σφάλμα σύγκλισης σε μονάδες του υδραυλικού φορτίου = ',F10.7
-     $/'Μεγιστη μεταβολή του φορτίου σε κάθε χρονικό βήμα  = ',F10.7
-     $/'Παροχή άρδευσης ή βροχόπτωσης(m/hr)                = ',F10.7
-     $/'Τελική τιμή του χρόνου(hours)                      = ',F10.2     
-     $/'Αρχικό χρονικό βήμα εκτέλεσης(hours)               = ',F10.7     
-     $/'Αριθμός επαναλήψεων σύγκλισης                      = ',I10)
- 2060 FORMAT(//'ΕΔΑΦΙΚΕΣ ΠΑΡΑΜΕΤΡΟΙ ΤΗΣ ΠΑΝΩ ΣΤΡΩΣΗΣ'
-     $/'Υγρασία κορεσμού                    = ',F8.5
-     $/'Υπολειματική υγρασία                = ',F8.5
-     $/'Υδραυλική αγωγιμότητα κορεσμού'
-     $/'κατά την οριζόντια διεύθυνση(m/hr)  = ',F8.5
-     $/'Υδραυλική αγωγιμότητα κορεσμού'
-     $/'κατά την κατακόρυφη διεύθυνση(m/hr) = ',F8.5
-     $/'Παράμετροι εδαφικής υγρασίας'
+     $/'Initial piezometric head(m)                  = ',F10.2
+     $/'Convergence error in units of head = ',F10.7
+     $/'Maximun head in each time step = ',F10.7
+     $/'Irrigation or rainfall(m/hr)                = ',F10.7
+     $/'Simulation time(hours)                      = ',F10.2     
+     $/'Initial tiem step(hours)               = ',F10.7     
+     $/'Number of iterations for convergence = ',I10)
+ 2060 FORMAT(//'SOIL PARAMETERS OF UPPER SOIL LAYER'
+     $/'SATURATION MOISTURE = ',F8.5
+     $/'RESIDENCE MOISTURE = ',F8.5
+     $/'HYDRAULIC CONDUCTIVITY IN SATURATION'
+     $/'IN HORIZONTAL(m/hr)  = ',F8.5
+     $/'HYDRAULIC CONDUCTIVITY IN SATURATION'
+     $/'IN VERTICAL(m/hr) = ',F8.5
+     $/'PARAMETERS OF SOIL MOISTURE'
      $/'Hb1(m)=',F8.5,2X,'Ln1=',F8.5,2X,'N1=',F8.5)
- 2070 FORMAT(//'ΕΔΑΦΙΚΕΣ ΠΑΡΑΜΕΤΡΟΙ ΤΗΣ ΚΑΤΩ ΣΤΡΩΣΗΣ'
-     $/'Υγρασία κορεσμού                    = ',F8.5
-     $/'Υπολειματική υγρασία                = ',F8.5
-     $/'Υδραυλική αγωγιμότητα κορεσμού'
-     $/'κατά την οριζόντια διεύθυνση(m/hr)  = ',F8.5
-     $/'Υδραυλική αγωγιμότητα κορεσμού'
-     $/'κατά την κατακόρυφη διεύθυνση(m/hr) = ',F8.5
-     $/'Παράμετροι εδαφικής υγρασίας'
+ 2070 FORMAT(//'SOIL PARAMETERS OF LOWER LAYER'
+     $/'SATURATION MOISTURE                    = ',F8.5
+     $/'RESIDENCE MOISTURE                = ',F8.5
+     $/'HYDRAULIC CONDUCTIVITY IN SATURATION'
+     $/'IN HORIZONTAL(m/hr)  = ',F8.5
+     $/'HYDRAULIC CONDUCTIVITY IN SATURATION'
+     $/'IN VERTICAL(m/hr) = ',F8.5
+     $/'PARAMETERS OF SOIL MOISTURE'
      $/'Hb2(m)=',F8.5,2X,'Ln2=',F8.5,2X,'N2=',F8.5)	
- 2080 FORMAT(//'ΠΑΧΟΣ ΤΗΣ ΚΑΤΩ ΣΤΡΩΣΗΣ'/'YLAY(m)=',F8.5)
- 2085 FORMAT(//'ΑΡΙΘΜΟΣ ΣΗΜΕΙΩΝ ΑΡΙΘΜΗΤΙΚΗΣ ΟΛΟΚΛΗΡΩΣΗΣ'/'NGP=',I2)
- 2086 FORMAT(//'ΑΡΙΘΜΟΣ ΣΗΜΕΙΩΝ ΑΡΙΘΜΗΤΙΚΗΣ ΟΛΟΚΛΗΡΩΣΗΣ'
-     $/'Πεπερασμένων στοιχείων, NGP    =',I2
-     $/'Ημιάπειρων στοιχείων,   NGPINF =',I2)
- 2090 FORMAT(//'ΜΕΘΟΔΟΣ ΠΡΟΣΕΓΓΙΣΗΣ ΣΤΟ ΤΕΛΟΣ ΤΗΣ ΠΕΡΙΟΧΗΣ ΜΕΛΕΤΗΣ'
-     $/'Επιλογή μεθόδου    , INFMETHOD = ',A8
-     $/'Τιμή της παραμέτρου, a         =',E9.2
-     $/'Αρχή του άξονα -X , XSTART     =',E9.2
-     $/'Αρχή του άξονα -Y , YSTART     =',E9.2
-     $/'Φορά του άξονα -X , XX         =',E9.2
-     $/'Φορά του άξονα -Y , YY         =',E9.2)
- 2100 FORMAT('ΑΡΧΕΙΟ ΑΠΟΤΕΛΕΣΜΑΤΩΝ - PHI2_UnRiv.res'/33('*')
-     $/'ΤΙΜΕΣ ΦΟΡΤΙΟΥ ΣΤΟΥΣ ΚΟΜΒΟΥΣ'
-     $/'ΤΟΥ ΔΙΚΤΥΟΥ ΠΟΥ ΥΠΟΛΟΓΙΣΘΗΚΑΝ')
+ 2080 FORMAT(//'LOWER LAYER DEPTH'/'YLAY(m)=',F8.5)
+ 2085 FORMAT(//'NUMBER OF INTEGRATION POINTS'/'NGP=',I2)
+ 2086 FORMAT(//'NUMBER OF INTEGRATION POINTS'
+     $/'Finite elements, NGP    =',I2
+     $/'Infinite elements,   NGPINF =',I2)
+ 2090 FORMAT(//'APROACHING METHOD AT THE EDGE OF THE SIMULATION AREA'
+     $/'Selection of method, INFMETHOD = ',A8
+     $/'Parameter, a         =',E9.2
+     $/'Coordinate in axis -X , XSTART     =',E9.2
+     $/'Coordinate in axis -Y , YSTART     =',E9.2
+     $/'Direction in axis -X , XX         =',E9.2
+     $/'Direction in axis -Y , YY         =',E9.2)
+ 2100 FORMAT('OUTPUT FILE - RESULTS - PHI2_UnRiv.res'/33('*')
+     $/'HEAD IN NODES'
+     $/'OF MESH')
 !
 !
 !
-!ΠΟΡΕΙΑ ΤΩΝ ΥΠΟΛΟΓΙΣΜΩΝ
+!CALCULATION ROUTE
 !
-C	1.	Αρχή βρόγχου επαναλήψεων σύγκλισης
-C	2.	Αρχή βρόγχου για κάθε στοιχείο
-C	3.1	Ανάγνωση των συντεταγμένων των κόμβων του στοιχείου
-C	3.2	Υπολογισμός του ύψους πίεσης των κόμβων του στοιχείου
-C	3.3	Εύρεση των ημιάπειρων στοιχείων
-C	3.4	Επίλυση χωρίς τη χρήση ημιάπειρων στοιχείων
-C	3.5	Αριθμητική ολοκλήρωση ανάλογα με το είδος του στοιχείου
-C	4.	Αρχή βρόγχων για κάθε σημείο ολοκλήρωσης
-C	5.	Υπολογισμός των μητρώων B*,Bm*,xizi,N,M,B,Bm,J - SHAPEFUN
-C	6.	Υπολογισμός των C(h) και K(h) - BROOKS_COREY
-C	7.	Κλείσιμο βρόγχου για κάθε σημείο ολοκλήρωσης
-C	8.	Δημιουργία των μητρώων του στοιχείου	
-C	9.	Συνένωση των στοιχείων
-C	10.	Κλείσιμο βρόγχου για κάθε στοιχείο
-C	11.1	Εισαγωγή οριακής συνθήκης προκαθορισμένου φορτίου
-C	11.2	Εισαγωγή παροχής άρδευσης ή βροχόπτωσης
-C	12.	Επίλυση του συστήματος των εξισώσεων - GAUSS
-C	13.	Έλεγχος του κριτηρίου σύγκλισης
-C	14.	Κλείσιμο του βρόγχου σύγκλισης
-C	14.1	Μείωση του χρονικού βήματος σε περίπτωση μη σύγκλισης
-C		και επιστροφή στο βήμα 1 (GOTO)
-C	14.2	Εύρεση της μέγιστης μεταβολής του φορτίου
-C	14.3	Έλεγχος της μεταβολής του φορτίου στο τέλος της περιοχής
-C		και πιθανή έξοδος από το πρόγραμμα - βήμα 22 (GOTO)
-C	15.	Υπολογισμός της παροχής στους κόμβους προκαθορισμένου φορτίου
-C	16.	Προστιθέμενος όγκος νερού βάση των τιμών της παροχής στους
-C		κόμβους προκαθορισμένου φορτίου και προκαθορισμένης παροχής
-C	17.	Υπολογισμός της μεταβολής του όγκου στην περιοχή ροής
-C	18.	Εκτύπωση των αποτελεσμάτων της δεδομένης χρονικής στιγμής
-C	18.1	Προετοιμασία για την επόμενη χρονική στιγμή
-C	19.	Έλεγχος της τελικής τιμής του χρόνου
-C		και έξοδος από το πρόγραμμα - βήμα 22 (GOTO)
-C	20.	Αύξηση του χρονικού βήματος σε περίπτωση γρήγορης σύγκλισης
-C		για την επόμενη χρονική στιγμή
-C	21.	Επιστροφή στο βήμα 1 (GOTO)
-C	22.	Έξοδος από το πρόγραμμα
+C	1.	Loop for convergence
+C	2.	Loop for each element
+C	3.1	Read of coordinates of element nodes
+C	3.2	Calculation of pressure head of element nodes
+C	3.3	Searching for the infinite elements
+C	3.4	Solving without the infinite elements
+C	3.5	Numerical integration depending of the element type
+C	4.	Loop for each integration point
+C	5.	Matrices calculation B*,Bm*,xizi,N,M,B,Bm,J - SHAPEFUN
+C	6.	Calculation of C(h) and K(h) - BROOKS_COREY
+C	7.	Loop end for each integration point
+C	8.	Creation of element matrices
+C	9.	Assemblage of elements
+C	10.	Loop end for each element
+C	11.1	Boundary condition of known head
+C	11.2	Irrigation or rain
+C	12.	Solving the equation system - GAUSS
+C	13.	Checking of convergence criterion
+C	14.	Loop end for convergence
+C	14.1	Reduce the time step in case of non-convergence
+C		and return to step 1 (GOTO)
+C	14.2	Searching for the maximum head difference
+C	14.3	Searching for the head difference at the edge of the simulation area
+C		and potential exit from the program - βήμα 22 (GOTO)
+C	15.	Calculation of discharge of known head
+C	16.	Total water volume based on the discharge
+C		in the nodes of known head and discharge
+C	17.	Calculation of water volume in the flow area
+C	18.	Writing of results for the current time step
+C	18.1	Preperation for the next time step
+C	19.	Check for simulation time
+C		and exit from the program - βήμα 22 (GOTO)
+C	20.	Increase of time step in case of fast convergence
+C		for the next time step
+C	21.	Return to step 1 (GOTO)
+C	22.	Exit from the program
 
-!	Υπολογισμός του εμβαδού κάθε στοιχείου
+!	Calculation of element area
 	DO 50 NE=1,NELEM
 	AREA(NE)=X(NOD(NE,3))-X(NOD(NE,2))+X(NOD(NE,4))-X(NOD(NE,1))
  50 	AREA(NE)=0.5*AREA(NE)*(Y(NOD(NE,4))-Y(NOD(NE,3)))
-!	Υπολογισμός του αρχικά αποθηκευμένου όγκου νερού
+!	Calculation of the initial water volume 
 	CALL VOLUME(PHI,VOLSTART,AREA,NELEM,NNP,
      $NOD,X,Y,WOA,NGP,RJ,RW,NGPINF,RJINF,RWINF,
      $INFMETHOD,RA,XSTART,YSTART,Xdirec,Ydirec,
@@ -270,21 +270,21 @@ C	22.	Έξοδος από το πρόγραμμα
 	PHIEST=0
 	PHALF=0
 
-C	1.	Αρχή βρόγχου επαναλήψεων σύγκλισης
+C	1.	Loop for convergence
 	DO 999 ITER=1,ITERMAX
 	IF (ITERCHECK==0) THEN	!ITERCHECK
 	AK=0
 	BK=0
 	AKQ=0
 	BKQ=0
-C	2.	Αρχή βρόγχου για κάθε στοιχείο
+C	2.	Loop for each element
 	DO 998 NE=1,NELEM
 	INFCHECK=0
 	DO 100 I=1,4
-C	3.1	Ανάγνωση των συντεταγμένων των κόμβων του στοιχείου
+C	3.1	Read of coordinates of element nodes
 	XY(I,1)=X(NOD(NE,I))
  	XY(I,2)=Y(NOD(NE,I))
-C	3.2	Υπολογισμός του ύψους πίεσης των κόμβων του στοιχείου
+C	3.2	Calculation of pressure head of element nodes
 	IF (ITER==1) THEN
 	 IF (TIME==0.0) THEN
 	  PHALF(NOD(NE,I))=PHI(NOD(NE,I))
@@ -297,9 +297,9 @@ C	3.2	Υπολογισμός του ύψους πίεσης των κόμβων του στοιχείου
 	 ENDIF
 	ENDIF
 	PG(I)=PHALF(NOD(NE,I))-Y(NOD(NE,I))
-C	3.3 Εύρεση των ημιάπειρων στοιχείων
+C	3.3 Searching for the infinite elements
 	IF (XY(I,1)==WOA) INFCHECK=1
-C	3.4 Επίλυση χωρίς τη χρήση ημιάπειρων στοιχείων
+C	3.4 Solving without the infinite elements
 	IF (INFMETHOD==0) INFCHECK=0
  100	CONTINUE
 	
@@ -309,7 +309,7 @@ C	3.4 Επίλυση χωρίς τη χρήση ημιάπειρων στοιχείων
 	RJ1=0
 	RW1=0
 
-C	3.5 Αριθμητική ολοκλήρωση ανάλογα με το είδος του στοιχείου
+C	3.5 Numerical integration depending of the element type
 	IF (INFCHECK==0) THEN
 	 NGP1=NGP
 	 RJ1=RJ
@@ -319,49 +319,48 @@ C	3.5 Αριθμητική ολοκλήρωση ανάλογα με το είδος του στοιχείου
 	 RJ1=RJINF
 	 RW1=RWINF
 	ENDIF
-C	4.	Αρχή βρόγχων για κάθε σημείο ολοκλήρωσης
+C	4.	Loop for each integration point
 	DO 997 IN=1,NGP1
 	DO 997 JN=1,NGP
-C	5.	Υπολογισμός των μητρώων B*,Bm*,xizi,N,M,B,Bm,J - SHAPEFUN
+C	5.	Matrices calculation B*,Bm*,xizi,N,M,B,Bm,J - SHAPEFUN
 	CALL SHAPEFUN(IN,JN,RJ1,RJ,XY,DJ,SF,B,
      $INFCHECK,SFM,BM,INFMETHOD,RA,XSTART,YSTART,Xdirec,Ydirec)
 
-C	6.	Υπολογισμός των C(h) και K(h) - BROOKS_COREY
+C	6.	Calculation of C(h) και K(h) - BROOKS_COREY
 	CALL BROOKS_COREY(YLAY,SF,SFM,XY,PG,CKXY,C,WET,
      $TSAT1,TRES1,CKSXX1,CKSYY1,HB1,CLM1,CN1,
      $TSAT2,TRES2,CKSXX2,CKSYY2,HB2,CLM2,CN2)
 
-	B1=MATMUL(TRANSPOSE(BM),CKXY)	!Υπολογισμός του χωρικού μητρώου
+	B1=MATMUL(TRANSPOSE(BM),CKXY)	
 	IF (INFCHECK==0) AK1=AK1+RW1(IN)*RW(JN)*DJ*DT*MATMUL(B1,BM)
 	IF (INFCHECK==1) AK1=AK1+0.5*RW1(IN)*RW(JN)*DJ*DT*MATMUL(B1,BM)
 	
-	DO 150 I=1,4					!Υπολογισμός του χρονικού μητρώου
+	DO 150 I=1,4					
 	IF (INFCHECK==0) AK2(I,I)=AK2(I,I)+RW1(IN)*RW(JN)*C*DJ*SFM(I)
 	IF (INFCHECK==1) AK2(I,I)=AK2(I,I)+0.5*RW1(IN)*RW(JN)*C*DJ*SFM(I)
  150	CONTINUE
 
  997	CONTINUE
-C	7.	Κλείσιμο βρόγχου για κάθε σημείο ολοκλήρωσης
+C	7.	Loop end for each integration point
 
-C	8.	Δημιουργία των μητρώων του στοιχείου	
+C	8.	Creation of element matrices
 	AK1=AK1+AK2
 	DO 200 I=1,4
 	BK1(I)=0
 	DO 200 J=1,4
  200	BK1(I)=BK1(I)+AK2(I,J)*PHI(NOD(NE,J))
 
-C	9.	Συνένωση των στοιχείων
+C	9.	Assemblage of elements
 	DO 250 I=1,4
 	BK(NOD(NE,I))=BK(NOD(NE,I))+BK1(I)
 	DO 250 J=1,4
-	IF(NOD(NE,I)<=NOD(NE,J)) THEN		!Λαμβάνεται υπόψη η συμμετρικότητα
+	IF(NOD(NE,I)<=NOD(NE,J)) THEN		!SYMETRY
 	 AK(NOD(NE,I),NOD(NE,J)-NOD(NE,I)+1)=
      $ AK(NOD(NE,I),NOD(NE,J)-NOD(NE,I)+1)+AK1(I,J)
 	ENDIF
  250	CONTINUE
 
-C	9.	Αποθήκευση των συντελεστών που απαιτούνται για τον υπολογισμό
-C		της παροχής στους κόμβους προκαθορισμένου φορτίου
+
 	DO 251 I=1,4
 	BKQ(NOD(NE,I))=BKQ(NOD(NE,I))+BK1(I)
 	DO 251 J=1,4
@@ -369,9 +368,9 @@ C		της παροχής στους κόμβους προκαθορισμένου φορτίου
  251	CONTINUE
 
  998	CONTINUE
-C	10.	Κλείσιμο βρόγχου για κάθε στοιχείο
+C	10.	Loop end for each element
 
-C	11.1	Εισαγωγή οριακής συνθήκης προκαθορισμένου φορτίου
+C	11.1	Boundary condition of known head
 	DO 300 I=1,NNP
 	DO 300 J=1,NFIX
 	IF(NNX(J)==I) THEN
@@ -380,7 +379,7 @@ C	11.1	Εισαγωγή οριακής συνθήκης προκαθορισμένου φορτίου
 	ENDIF
  300	CONTINUE
 
-C	11.2	Εισαγωγή παροχής άρδευσης ή βροχόπτωσης
+C	11.2	Irrigation or rain
 	VOL2=0.
 	DO 350 I=1,NNP
 	DO 350 J=1,NQ
@@ -394,16 +393,16 @@ C	11.2	Εισαγωγή παροχής άρδευσης ή βροχόπτωσης
 
 
 C	------------------------------------------------
-C	12.	Επίλυση του συστήματος των εξισώσεων - GAUSS
+C	12.	Solving the equation system - GAUSS
 C	------------------------------------------------
 	CALL GAUSS(AK,BK,NNP,NBAND,PHINEW)
 
 
 
 
-C	13.	Έλεγχος του κριτηρίου σύγκλισης
+C	13.	Checking of convergence criterion
 	DMAX1=0.0
-	DO 400 I=1,NNP		!Σάρωση όλων των κόμβων
+	DO 400 I=1,NNP		
 	DIFF=ABS(PHINEW(I)-PHIEST(I))
 	IF (DIFF>=DMAX1) THEN
 	 DMAX1=DIFF
@@ -421,47 +420,45 @@ C	13.	Έλεγχος του κριτηρίου σύγκλισης
 
 	ENDIF				!ITERCHECK
  999	CONTINUE
-C	14.	Κλείσιμο του βρόγχου σύγκλισης
-
-C	14.1	Μείωση του χρονικού βήματος σε περίπτωση μη σύγκλισης
-C		και επιστροφή στο βήμα 1 (GOTO)
+C	14.	Loop end for convergence
+C	14.1	Reduce the time step in case of non-convergence
+C		and return to step 1 (GOTO)
 	IF (ITERCHECK==0) THEN
 	 DT=DT*0.5
 	 WRITE(*,*)'DT=',DT,' DMAX1=',DMAX1,' ITER=',ITER
 	 WRITE(14,2105)DT,DMAX1,IMAX1
 	 GOTO 5000
 	ENDIF
- 2105	FORMAT(/39('*')/'ΤΟ ΧΡΟΝΙΚΟ ΒΗΜΑ ΜΕΙΩΘΗΚΕ ΣΕ:',E10.3/
-     $'ΛΟΓΩ ΜΗ ΣΥΓΚΛΙΣΗΣ ΣΤΟ ΦΟΡΤΙΟ:',E10.3/
-     $'ΣΤΟΝ ΚΟΜΒΟ:',I10/39('*'))
+ 2105	FORMAT(/39('*')/'TIME STEP REDUCED IN :',E10.3/
+     $'DUE TO NO CONVERGENCE IN HEAD:',E10.3/
+     $'IN NODE:',I10/39('*'))
 
-C	14.2	Εύρεση της μέγιστης μεταβολής του φορτίου
-C		και πιθανή επιστροφή στο βήμα 1 (GOTO)
+C	14.2	Searching for the maximum head difference
+C		and return to step 1 (GOTO)
 	DMAX=0.0
-	DO 410 I=1,NNP		!Σάρωση όλων των κόμβων
+	DO 410 I=1,NNP		
 	DIFF=ABS(PHINEW(I)-PHI(I))
 	IF (DIFF>=DMAX) THEN
 	 DMAX=DIFF
 	 IMAX=I
 	ENDIF
  410	CONTINUE
-	!Έλεγχος της μέγιστης επιτρεπόμενης μεταβολής του φορτίου
-	!και μείωση του χρονικού βήματος
+	
 	IF (DMAX>=PHIVAR) THEN
 	 DT=DT*0.5
 	 WRITE(*,*)'DT=',DT,' DMAX=',DMAX
 	 WRITE(14,2106)DT,DMAX,IMAX
 	 GOTO 5000
 	ENDIF
- 2106	FORMAT(/41('*')/'ΤΟ ΧΡΟΝΙΚΟ ΒΗΜΑ ΜΕΙΩΘΗΚΕ ΣΕ:',E10.3/
-     $'ΛΟΓΩ ΜΕΓΑΛΗΣ ΜΕΤΑΒΟΛΗΣ ΦΟΡΤΙΟΥ:',E10.3/
-     $'ΣΤΟΝ ΚΟΜΒΟ:',I10/41('*'))
+ 2106	FORMAT(/41('*')/'TIME STEP REDUCED IN:',E10.3/
+     $'DUE TO HEAD DIFFERENCE:',E10.3/
+     $'IN NODE:',I10/41('*'))
 
-C	14.3	Έλεγχος της μεταβολής του φορτίου στο τέλος της περιοχής
-C		και πιθανή έξοδος από το πρόγραμμα - βήμα 22 (GOTO)
+C	14.3	Searching for the head difference at the edge of the simulation area
+C		and potential exit from the program - step 22 (GOTO)
 	IF (INFMETHOD==0) THEN
-	DO 430 I=1,NNP		!Σάρωση όλων των κόμβων
-	IF (X(I)==WOA) THEN	!Έλεγχος των κόμβων στο τέλος του δικτύου
+	DO 430 I=1,NNP		
+	IF (X(I)==WOA) THEN	
 	 IF (ABS(HSTART-PHINEW(I))>=ERROR1) THEN
 	  WRITE(*,*) 'PROGRAMME TERMINATED'
 	  WRITE(*,*) 'Increase width of area OR use INFINITE elements'
@@ -473,7 +470,7 @@ C		και πιθανή έξοδος από το πρόγραμμα - βήμα 22 (GOTO)
  430	CONTINUE
 	ENDIF
 		
-C	15.	Υπολογισμός της παροχής στους κόμβους προκαθορισμένου φορτίου
+C	15.	Calculation of discharge of known head
 	DO 500 I=1,NNP
 	BKQ1(I)=0.
 	DO 500 J=1,NNP
@@ -487,13 +484,13 @@ C	15.	Υπολογισμός της παροχής στους κόμβους προκαθορισμένου φορτίου
 	ENDIF
  501	CONTINUE
 
-C	16.	Προστιθέμενος όγκος νερού βάση των τιμών της παροχής στους
-C		κόμβους προκαθορισμένου φορτίου και προκαθορισμένης παροχής
+C	16.	Total water volume based on the discharge
+C		in the nodes of known head and discharge
 	VOLUMEQ=VOLQ+QSUM*DT+VOL2
 
 
-C	17.	Υπολογισμός της μεταβολής του όγκου στην περιοχή ροής		
-C		βάση των υπολογιζόμενων τιμών του φορτίου
+C	17.	Calculation of water volume in the flow area
+C		
 	CALL VOLUME(PHINEW,VOLUMEPHI,AREA,NELEM,NNP,
      $NOD,X,Y,WOA,NGP,RJ,RW,NGPINF,RJINF,RWINF,
      $INFMETHOD,RA,XSTART,YSTART,Xdirec,Ydirec,
@@ -501,10 +498,10 @@ C		βάση των υπολογιζόμενων τιμών του φορτίου
      $TSAT2,TRES2,CKSXX2,CKSYY2,HB2,CLM2,CN2)
 
 
-C	18.	Εκτύπωση των αποτελεσμάτων της δεδομένης χρονικής στιγμής
+C	18.	Writing of results for the current time step
 	TIME=TIME+DT
 	WRITE(*,*)TIME,DT,ITER1,DMAX
-	IF (MOD(TIME,1.)==0.) THEN	!Εκτύπωση ανά μία ώρα
+	IF (MOD(TIME,1.)==0.) THEN	
 	WRITE(10,2110)TIME,DT,ITER1,DMAX,IMAX,DMAX1,IMAX1
 	WRITE(12,2110)TIME,DT,ITER1,DMAX,IMAX,DMAX1,IMAX1
 	WRITE(13,2110)TIME,DT,ITER1,DMAX,IMAX,DMAX1,IMAX1
@@ -520,15 +517,15 @@ C	18.	Εκτύπωση των αποτελεσμάτων της δεδομένης χρονικής στιγμής
  900	CONTINUE
 	WRITE(14,2140)(I,PHINEW(I),I=1,NNP)
 	WRITE(13,2150)QSUM,TIME
-	ENDIF						!Εκτύπωση ανά μία ώρα
+	ENDIF						
 	WRITE(11,*)TIME,VOLUMEQ,VOLUMEPHI
 	WRITE(20,*)TIME,QSUM
 
  2110 FORMAT(///16X,'TIME(hours)=',E10.3/
      $16X,'DT(hours)  =',E10.3/
      $16X,'ITER       =',I10/
-     $8X,'Μέγιστη μεταβολή φορτίου(m)=',E10.3,1X,'στον κόμβο=',I5/
-     $8X,'Μέγιστο σφάλμα σύγκλισης(m)=',E10.3,1X,'στον κόμβο=',I5/
+     $8X,'Maximum head difference(m)=',E10.3,1X,'στον κόμβο=',I5/
+     $8X,'Maximum convrgence error(m)=',E10.3,1X,'στον κόμβο=',I5/
      $73('-')/)
  2120 FORMAT(2(1X,F10.3),(1X,F10.3))
  2121 FORMAT(2(1X,F10.3),2(1X,F10.3))
@@ -536,39 +533,40 @@ C	18.	Εκτύπωση των αποτελεσμάτων της δεδομένης χρονικής στιγμής
  2140 FORMAT(5(1X,I5,':',F6.3,2X))
  2150 FORMAT('ΠΑΡΟΧΗ='1X,E8.3,2X,'ΣΤΟ ΧΡΟΝΟ= ',F6.3)
 
-C	18.1	Προετοιμασία για την επόμενη χρονική στιγμή
+C	18.1	Preperation for the next time step
 	DTOLD=DT
 	PHIOLD=PHI
 	PHI=PHINEW
 	VOLQ=VOLUMEQ
 	VOLPHI=VOLUMEPHI
 
-C	19.	Έλεγχος της τελικής τιμής του χρόνου
-C		και έξοδος από το πρόγραμμα - βήμα 22 (GOTO)
+C	19.	Check for simulation time
+C		and exit from the program - step 22 (GOTO)
 	IF (TIME>=TSTOP) GOTO 6000
 
-C	20.	Μεταβολή του χρονικού βήματος για την επόμενη χρονική στιγμή
-	DT1=DTOLD*PHIVAR/DMAX	!Βάση της μεταβολής φορτίου
-	DT2=DTOLD*1.2			!Αύξηση κατά 20%
-	DT3=AINT(TIME)+1-TIME	!Στρογγυλοποίηση ανά ώρα
-	DT=MIN(DT1,DT2,DT3)		!Επιλογή χρονικού βήματος από τα παραπάνω
+C	20.	Increase of time step in case of fast convergence
+	DT1=DTOLD*PHIVAR/DMAX	
+	DT2=DTOLD*1.2		
+	DT3=AINT(TIME)+1-TIME	
+	DT=MIN(DT1,DT2,DT3)	
 
-C	21.	Επιστροφή στο βήμα 1 (GOTO)
+C	21.	Return to step 1 (GOTO)
 	GOTO 5000
 
-C	22.	Έξοδος από το πρόγραμμα
+C	22.	Exit from the program
+
  6000	CONTINUE
 
 
-							!Υπολογιστικοί χρόνοι που απαιτήθηκαν
+							
 	CALL CPU_TIME(TIMEEND)
 	TIMEEQ=TIMEEND-TIMEBEGIN
 	TIMETOTAL=TIMERENUM+TIMEEQ
 	WRITE(9,2200)TIMERENUM,TIMEEQ/60,TIMETOTAL/60
  2200 FORMAT(//'ΥΠΟΛΟΓΙΣΤΙΚΟΙ ΧΡΟΝΟΙ ΠΟΥ ΑΠΑΙΤΗΘΗΚΑΝ'/
-     $'Για την αναρίθμηση του δικτύου (seconds) ='F10.3/
-     $'Για την επίλυση της εξίσωσης   (minutes) ='F10.3/
-     $'Συνολικός υπολογιστικός χρόνος (minutes) ='F10.3)
+     $'for the renumbering of mesh(seconds) ='F10.3/
+     $'for the equation(minutes) ='F10.3/
+     $'Total computational time(minutes) ='F10.3)
 	WRITE(*,*)
 	WRITE(*,*)'RESULTS ARE IN FILES UnRiv1.res & UnRiv2.res'
 	WRITE(*,*)
@@ -582,8 +580,6 @@ C	22.	Έξοδος από το πρόγραμμα
      $INFMETHOD,RA,XSTART,YSTART,Xdirec,Ydirec,
      $YLAY,TSAT1,TRES1,CKSXX1,CKSYY1,HB1,CLM1,CN1,
      $TSAT2,TRES2,CKSXX2,CKSYY2,HB2,CLM2,CN2)
-C	ΥΠΟΛΟΓΙΖΕΤΑΙ Ο ΑΠΟΘΗΚΕΥΜΕΝΟΣ ΟΓΚΟΣ ΝΕΡΟΥ
-C	ΒΑΣΗ ΤΩΝ ΥΠΟΛΟΓΙΖΟΜΕΝΩΝ ΤΙΜΩΝ ΤΟΥ ΦΟΡΤΙΟΥ
 	DOUBLE PRECISION PHI,X,Y,SF,SFM,B,BM
 	DIMENSION PHI(NNP),X(NNP),Y(NNP)
 	DIMENSION SF(4),B(2,4),SFM(4),BM(2,4)
@@ -637,17 +633,12 @@ C	ΒΑΣΗ ΤΩΝ ΥΠΟΛΟΓΙΖΟΜΕΝΩΝ ΤΙΜΩΝ ΤΟΥ ΦΟΡΤΙΟΥ
 
 	SUBROUTINE SHAPEFUN(IN,JN,RJ,RJ2,XY,DJ,SF,B,
      $INFCHECK,SFM,BM,INFMETHOD,RA,XSTART,YSTART,XX,YY)
-C	ΥΠΟΛΟΓΙΖΟΝΤΑΙ ΓΙΑ ΚΑΘΕ ΣΗΜΕΙΟ ΟΛΟΚΛΗΡΩΣΗΣ
-C	ΟΙ ΣΥΝΑΡΤΗΣΕΙΣ ΜΟΡΦΗΣ (SF)
-C	ΟΙ ΠΑΡΑΓΩΓΟΙ ΑΥΤΩΝ (BS)
-C	ΤΟ ΙΑΚΩΒΙΑΝΟ ΜΗΤΡΩΟ (AJ) ΚΑΙ Η ΟΡΙΖΟΥΣΑ ΑΥΤΟΥ (DJ)
-C	ΤΟ ΜΗΤΡΩΟ Β
 	DOUBLE PRECISION SF,SFM,BS,BSM,B,BM
 	DIMENSION RJ(10),RJ2(10),SF(4),BS(2,4),B(2,4),XY(4,2),AJ(2,2)
 	DIMENSION SFM(4),BSM(2,4),BM(2,4),SR(4)
 	DIMENSION SF1(4),BS1(2,4),PHI(4),PG(4)
 
-	IF (INFCHECK==0) THEN	!Κανονικό στοιχείο
+	IF (INFCHECK==0) THEN	!finite element
 	RIN1=1.-RJ(IN)
 	RIN2=1.+RJ(IN)
 	RJN1=1.-RJ(JN)
@@ -670,17 +661,17 @@ C	ΤΟ ΜΗΤΡΩΟ Β
 	AJ=MATMUL(BS,XY)
 	SFM=SF
 	BSM=BS
-	ENDIF					!Κανονικό στοιχείο
+	ENDIF					
 
 
 
-	IF (INFCHECK==1) THEN	!Ημιάπειρο στοιχείο
+	IF (INFCHECK==1) THEN	!infinite element
 	RIN1=1.-RJ(IN)
 	RIN2=1.+RJ(IN)
 	RJN1=1.-RJ2(JN)
 	RJN2=1.+RJ2(JN)
 
-	IF (RJ(IN)<=0) THEN		!Πεπερασμένο τμήμα του ημιάπειρου στοιχείου
+	IF (RJ(IN)<=0) THEN		
 	SF(1)=-RJ(IN)*RJN2*0.5
 	SF(2)=-RJ(IN)*RJN1*0.5
 	SF(3)=RIN2*RJN1*0.5
@@ -698,9 +689,9 @@ C	ΤΟ ΜΗΤΡΩΟ Β
 	AJ=MATMUL(BS,XY)
 	SFM=SF
 	BSM=BS
-	ENDIF					!Πεπερασμένο τμήμα του ημιάπειρου στοιχείου
+	ENDIF					
 
-	IF (RJ(IN)>0) THEN		!Απειρίζον τμήμα του ημιάπειρου στοιχείου
+	IF (RJ(IN)>0) THEN		
 	SF(1)=-0.5*RJ(IN)*RJN2/RIN1
 	SF(2)=-0.5*RJ(IN)*RJN1/RIN1
 	SF(3)=0.5*RJN1/RIN1
@@ -752,8 +743,8 @@ C	ΤΟ ΜΗΤΡΩΟ Β
 	BSM(2,I)=(BS1(2,I)-RA*SYY*SF1(I)/SRS)*EXP(RA*(SR(I)-SRS))
 	ENDIF
   10	CONTINUE
-	ENDIF					!Απειρίζον τμήμα του ημιάπειρου στοιχείου
-	ENDIF					!Ημιάπειρο στοιχείο
+	ENDIF					
+	ENDIF					
 
 	DJ=AJ(1,1)*AJ(2,2)-AJ(1,2)*AJ(2,1)
 	DUMMY=AJ(1,1)
@@ -772,11 +763,6 @@ C	ΤΟ ΜΗΤΡΩΟ Β
 	SUBROUTINE BROOKS_COREY(YLAY,SF,SFM,XY,PG,CKXY,C,WET,
      $TSAT1,TRES1,CKSXX1,CKSYY1,HB1,CLM1,CN1,
      $TSAT2,TRES2,CKSXX2,CKSYY2,HB2,CLM2,CN2)
-C	ΥΠΟΛΟΓΙΖΟΝΤΑΙ ΓΙΑ ΚΑΘΕ ΣΗΜΕΙΟ ΟΛΟΚΛΗΡΩΣΗΣ
-C	ΑΝΑΛΟΓΑ ΜΕ ΤΗΝ ΕΔΑΦΙΚΗ ΣΤΡΩΣΗ ΠΟΥ ΒΡΙΣΚΕΤΑΙ ΚΑΙ
-C	ΑΝΑΛΟΓΑ ΜΕ ΤΗΝ ΥΓΡΑΣΙΑΚΗ ΚΑΤΑΣΤΑΣΗ ΤΟΥ (ΚΟΡΕΣΜΕΝΗ-ΑΚΟΡΕΣΤΗ)
-C	ΤΟ ΜΗΤΡΩΟ ΤΗΣ ΥΔΡΑΥΛΙΚΗΣ ΑΓΩΓΙΜΟΤΗΤΑΣ (CKXY)
-C	Η ΥΔΡΑΥΛΙΚΗ ΧΩΡΗΤΙΚΟΤΗΤΑ (C)
 	DOUBLE PRECISION SF,SFM
 	DIMENSION SF(4),SFM(4),XY(4,2),PG(4),CKXY(2,2)
 	YNGP=0.0
@@ -826,9 +812,6 @@ C	Η ΥΔΡΑΥΛΙΚΗ ΧΩΡΗΤΙΚΟΤΗΤΑ (C)
 
 
 	SUBROUTINE GAUSS(A,B,N,M,PHINEW)
-C	ΕΠΙΛΥΕΤΑΙ ΣΥΜΦΩΝΑ ΜΕ ΤΟΝ ΑΛΓΟΡΙΘΜΟ ΤΟΥ GAUSS
-C	ΤΟ ΣΥΣΤΗΜΑ ΤΩΝ ΕΞΙΣΩΣΕΩΝ ΛΑΜΒΑΝΟΝΤΑΣ ΥΠΟΨΗ ΤΟ ΕΥΡΟΣ ΤΟΥ ΔΙΚΤΥΟΥ
-C	ΚΑΙ ΕΠΙΣΤΡΕΦΟΝΤΑΙ ΥΠΟΛΟΓΙΖΟΜΕΝΕΣ ΤΙΜΕΣ ΤΟΥ ΦΟΡΤΙΟΥ (PHINEW)
 	DOUBLE PRECISION A,B,PHINEW
 	DIMENSION A(N,M),C(M),B(N),PHINEW(N)
 
